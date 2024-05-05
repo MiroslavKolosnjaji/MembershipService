@@ -5,6 +5,7 @@ import com.example.membershipservice.model.MembershipId;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -12,6 +13,6 @@ import java.time.LocalDateTime;
  */
 public interface MembershipRepository extends ReactiveCrudRepository<Membership, MembershipId> {
 
-    Mono<Membership> findByGymIdAndMemberIdAndDateFrom(Long gymId, Long membershipId, LocalDateTime dateFrom);
-    Mono<Void> deleteByGymIdAndMemberIdAndDateFrom(Long gymId, Long membershipId, LocalDateTime dateFrom);
+    Mono<Membership> findByGymIdAndMemberIdAndDateFrom(Long gymId, Long membershipId, LocalDate dateFrom);
+    Mono<Void> deleteByGymIdAndMemberIdAndDateFrom(Long gymId, Long membershipId, LocalDate dateFrom);
 }

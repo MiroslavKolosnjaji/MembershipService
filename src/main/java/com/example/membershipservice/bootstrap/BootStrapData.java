@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -28,11 +29,11 @@ public class BootStrapData implements CommandLineRunner {
 
     private void loadMembershipData(){
         membershipRepository.count().subscribe(count -> {
-            MembershipDTO membership1 = MembershipDTO.builder().gymId(1L).memberId(1L).dateFrom(LocalDateTime.now()).membershipType(MembershipType.MONTHLY).build();
-            MembershipDTO membership2 = MembershipDTO.builder().gymId(1L).memberId(2L).dateFrom(LocalDateTime.now()).membershipType(MembershipType.ANNUAL).build();
-            MembershipDTO membership3 = MembershipDTO.builder().gymId(1L).memberId(3L).dateFrom(LocalDateTime.now()).membershipType(MembershipType.BIWEEKLY).build();
-            MembershipDTO membership4 = MembershipDTO.builder().gymId(1L).memberId(4L).dateFrom(LocalDateTime.now()).membershipType(MembershipType.DAILY).build();
-            MembershipDTO membership5 = MembershipDTO.builder().gymId(1L).memberId(5L).dateFrom(LocalDateTime.now()).membershipType(MembershipType.STUDENT).build();
+            MembershipDTO membership1 = MembershipDTO.builder().gymId(1L).memberId(1L).dateFrom(LocalDate.now()).membershipType(MembershipType.MONTHLY).build();
+            MembershipDTO membership2 = MembershipDTO.builder().gymId(1L).memberId(2L).dateFrom(LocalDate.now()).membershipType(MembershipType.ANNUAL).build();
+            MembershipDTO membership3 = MembershipDTO.builder().gymId(1L).memberId(3L).dateFrom(LocalDate.now()).membershipType(MembershipType.BIWEEKLY).build();
+            MembershipDTO membership4 = MembershipDTO.builder().gymId(1L).memberId(4L).dateFrom(LocalDate.now()).membershipType(MembershipType.DAILY).build();
+            MembershipDTO membership5 = MembershipDTO.builder().gymId(1L).memberId(5L).dateFrom(LocalDate.now()).membershipType(MembershipType.STUDENT).build();
 
 
             membershipService.addMembership(membership1).subscribe();

@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -28,5 +29,5 @@ public class MembershipId implements Serializable {
 
     @Id
     @Column("date_from")
-    private LocalDateTime dateFrom;
+    private LocalDate dateFrom;
 }

@@ -9,6 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -19,7 +20,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class Membership {
-    
+
     @Column("gym_id")
     private Long gymId;
 
@@ -28,9 +29,9 @@ public class Membership {
 
     @Column("date_from")
     @CreatedDate
-    private LocalDateTime dateFrom;
+    private LocalDate dateFrom;
 
-    private LocalDateTime dateTo;
+    private LocalDate dateTo;
     private MembershipType membershipType;
     private BigDecimal price;
 }

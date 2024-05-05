@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -53,8 +54,8 @@ public class MembershipServiceImpl implements MembershipService {
     }
 
     @Override
-    public Mono<MembershipDTO> getMembership(Long gymId, Long memberId, LocalDateTime created) {
-        return membershipRepository.findByGymIdAndMemberIdAndDateFrom(gymId, memberId, created)
+    public Mono<MembershipDTO> getMembership(Long gymId, Long memberId, LocalDate dateFrom) {
+        return membershipRepository.findByGymIdAndMemberIdAndDateFrom(gymId, memberId, dateFrom)
                 .switchIfEmpty(Mono.error(new MembershipNotFoundException("Membership not found!")))
                 .map(membershipMapper::membershipToMembershipDTO);
     }
@@ -65,18 +66,22 @@ public class MembershipServiceImpl implements MembershipService {
     }
 
     @Override
-    public Mono<Void> deleteMembership(Long gymId, Long memberId, LocalDateTime dateFrom) {
+    public Mono<Void> deleteMembership(Long gymId, Long memberId, LocalDate dateFrom) {
         return membershipRepository.deleteByGymIdAndMemberIdAndDateFrom(gymId, memberId, dateFrom);
     }
 
-    public LocalDateTime getDateTo(LocalDateTime dateFrom, MembershipType membershipType) {
-        return switch (membershipType) {
-            case TRIAL -> dateFrom.plusDays(3);
-            case DAILY -> dateFrom.plusDays(1);
-            case BIWEEKLY -> dateFrom.plusWeeks(2);
-            case MONTHLY, STUDENT -> dateFrom.plusMonths(1);
-            case ANNUAL -> dateFrom.plusYears(1);
-            case CORPORATE -> dateFrom.plusMonths(3);
+    public LocalDate getDateTo(LocalDate dateFrom, MembershipType membershipType) {
+        LocalDateTime dateFromWithTime = dateFrom.atStartOfDay();
+
+        LocalDateTime dateTo = switch (membershipType) {
+            case TRIAL -> dateFromWithTime.plusDays(3);
+            case DAILY -> dateFromWithTime.plusDays(1);
+            case BIWEEKLY -> dateFromWithTime.plusWeeks(2);
+            case MONTHLY, STUDENT -> dateFromWithTime.plusMonths(1);
+            case ANNUAL -> dateFromWithTime.plusYears(1);
+            case CORPORATE -> dateFromWithTime.plusMonths(3);
         };
+
+        return dateTo.toLocalDate();
     }
 }

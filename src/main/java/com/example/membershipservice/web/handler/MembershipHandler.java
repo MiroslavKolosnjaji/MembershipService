@@ -18,6 +18,7 @@ import org.springframework.web.server.ServerWebInputException;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,7 +55,7 @@ public class MembershipHandler {
         Map<String, String> idMap = getIDs(serverRequest);
 
         return ServerResponse.ok()
-                .body(membershipService.getMembership(Long.valueOf(idMap.get("gymId")), Long.valueOf(idMap.get("memberId")), LocalDateTime.parse(idMap.get("dateFrom")))
+                .body(membershipService.getMembership(Long.valueOf(idMap.get("gymId")), Long.valueOf(idMap.get("memberId")), LocalDate.parse(idMap.get("dateFrom")))
                         .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND))), Membership.class);
     }
 
@@ -65,7 +66,7 @@ public class MembershipHandler {
     public Mono<ServerResponse> deleteMembership(ServerRequest serverRequest) {
         Map<String, String> idMap = getIDs(serverRequest);
 
-        return membershipService.getMembership(Long.valueOf(idMap.get("gymId")), Long.valueOf(idMap.get("memberId")),LocalDateTime.parse(idMap.get("dateFrom")))
+        return membershipService.getMembership(Long.valueOf(idMap.get("gymId")), Long.valueOf(idMap.get("memberId")),LocalDate.parse(idMap.get("dateFrom")))
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
                 .flatMap(membershipDTO -> membershipService.deleteMembership(membershipDTO.getGymId(), membershipDTO.getMemberId(), membershipDTO.getDateFrom()))
                 .then(ServerResponse.noContent().build());

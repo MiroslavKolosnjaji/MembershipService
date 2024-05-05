@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -21,10 +22,10 @@ public class MembershipDTO {
 
     private Long gymId;
     private Long memberId;
-    private LocalDateTime dateFrom;
+    private LocalDate dateFrom;
 
     @NotNull
-    private LocalDateTime dateTo;
+    private LocalDate dateTo;
 
     @NotNull
     private MembershipType membershipType;
