@@ -1,6 +1,7 @@
 package com.example.membershipservice.dto;
 
 import com.example.membershipservice.model.MembershipType;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +10,6 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 /**
  * @author Miroslav Kološnjaji
@@ -20,8 +20,15 @@ import java.time.LocalDateTime;
 @Builder
 public class MembershipDTO {
 
+    private Long id;
+
+    @NotNull
     private Long gymId;
+
+    @NotNull
     private Long memberId;
+
+    @NotNull
     private LocalDate dateFrom;
 
     @NotNull

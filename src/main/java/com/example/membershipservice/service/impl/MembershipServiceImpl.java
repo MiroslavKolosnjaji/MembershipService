@@ -7,7 +7,9 @@ import com.example.membershipservice.model.MembershipType;
 import com.example.membershipservice.repository.MembershipRepository;
 import com.example.membershipservice.service.MembershipService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -26,7 +28,7 @@ public class MembershipServiceImpl implements MembershipService {
 
 
     @Override
-    public Mono<MembershipDTO> addMembership(MembershipDTO membershipDTO) {
+    public Mono<MembershipDTO> save(MembershipDTO membershipDTO) {
 
         membershipDTO.setDateTo(getDateTo(membershipDTO.getDateFrom(), membershipDTO.getMembershipType()));
         membershipDTO.setPrice(membershipDTO.getMembershipType().getPrice());
@@ -36,10 +38,9 @@ public class MembershipServiceImpl implements MembershipService {
     }
 
     @Override
-    public Mono<MembershipDTO> updateMembership(MembershipDTO membershipDTO) {
+    public Mono<MembershipDTO> update(MembershipDTO membershipDTO) {
 
-        return membershipRepository.findByGymIdAndMemberIdAndDateFrom(membershipDTO.getGymId()
-                        , membershipDTO.getMemberId(), membershipDTO.getDateFrom())
+        return membershipRepository.findById(membershipDTO.getId())
                 .switchIfEmpty(Mono.error(new MembershipNotFoundException("Membership not found!")))
                 .map(foundMembership -> {
                     foundMembership.setGymId(membershipDTO.getGymId());
@@ -53,11 +54,14 @@ public class MembershipServiceImpl implements MembershipService {
                 .map(membershipMapper::membershipToMembershipDTO);
     }
 
-    @Override
-    public Mono<MembershipDTO> getMembership(Long gymId, Long memberId, LocalDate dateFrom) {
-        return membershipRepository.findByGymIdAndMemberIdAndDateFrom(gymId, memberId, dateFrom)
+    public Mono<MembershipDTO> getById(Long id) {
+
+        return membershipRepository.findById(id)
                 .switchIfEmpty(Mono.error(new MembershipNotFoundException("Membership not found!")))
-                .map(membershipMapper::membershipToMembershipDTO);
+                .map(membershipMapper::membershipToMembershipDTO)
+                .flatMap(Mono::just)
+                .onErrorResume(MembershipNotFoundException.class, ex -> Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
+
     }
 
     @Override
@@ -66,8 +70,8 @@ public class MembershipServiceImpl implements MembershipService {
     }
 
     @Override
-    public Mono<Void> deleteMembership(Long gymId, Long memberId, LocalDate dateFrom) {
-        return membershipRepository.deleteByGymIdAndMemberIdAndDateFrom(gymId, memberId, dateFrom);
+    public Mono<Void> deleteById(Long id) {
+        return membershipRepository.deleteById(id);
     }
 
     public LocalDate getDateTo(LocalDate dateFrom, MembershipType membershipType) {

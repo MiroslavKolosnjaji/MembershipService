@@ -18,10 +18,6 @@ import org.springframework.web.server.ServerWebInputException;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Miroslav Kološnjaji
@@ -30,6 +26,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MembershipHandler {
 
+    public static final String MEMBERSHIP_ID = "membershipId";
     private final MembershipService membershipService;
     private final Validator validator;
 
@@ -37,26 +34,27 @@ public class MembershipHandler {
     public Mono<ServerResponse> createMembership(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(MembershipDTO.class)
                 .doOnSuccess(this::validate)
-                .flatMap(membershipService::addMembership)
+                .flatMap(membershipService::save)
                 .flatMap(savedMembership -> ServerResponse.created(UriComponentsBuilder.fromPath(MembershipRouterConfig.MEMBERSHIP_PATH_ID)
-                                .buildAndExpand(savedMembership.getGymId(), savedMembership.getMemberId(), savedMembership.getDateFrom()).toUri())
+                                .buildAndExpand(savedMembership.getId()).toUri())
                         .build());
     }
 
     public Mono<ServerResponse> updateMembership(ServerRequest serverRequest) {
+
         return serverRequest.bodyToMono(MembershipDTO.class)
-                .doOnNext(this::validate)
-                .flatMap(membershipService::updateMembership)
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                .flatMap(membershipDTO -> ServerResponse.noContent().build());
+                .doOnSuccess(this::validate)
+                .flatMap(membershipService::update)
+                .flatMap(membershipDTO -> ServerResponse.noContent().build())
+                .onErrorResume(MembershipNotFoundException.class, ex -> ServerResponse.notFound().build());
     }
 
     public Mono<ServerResponse> getMembershipById(ServerRequest serverRequest) {
-        Map<String, String> idMap = getIDs(serverRequest);
 
-        return ServerResponse.ok()
-                .body(membershipService.getMembership(Long.valueOf(idMap.get("gymId")), Long.valueOf(idMap.get("memberId")), LocalDate.parse(idMap.get("dateFrom")))
-                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND))), Membership.class);
+        return membershipService.getById(Long.valueOf(serverRequest.pathVariable(MEMBERSHIP_ID)))
+                .flatMap(membershipDTO -> ServerResponse.ok().bodyValue(membershipDTO))
+                .switchIfEmpty(ServerResponse.notFound().build())
+                .onErrorResume(MembershipNotFoundException.class, ex -> ServerResponse.notFound().build());
     }
 
     public Mono<ServerResponse> getAllMemberships(ServerRequest serverRequest) {
@@ -64,23 +62,12 @@ public class MembershipHandler {
     }
 
     public Mono<ServerResponse> deleteMembership(ServerRequest serverRequest) {
-        Map<String, String> idMap = getIDs(serverRequest);
 
-        return membershipService.getMembership(Long.valueOf(idMap.get("gymId")), Long.valueOf(idMap.get("memberId")),LocalDate.parse(idMap.get("dateFrom")))
+        return membershipService.getById(Long.valueOf(serverRequest.pathVariable(MEMBERSHIP_ID)))
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                .flatMap(membershipDTO -> membershipService.deleteMembership(membershipDTO.getGymId(), membershipDTO.getMemberId(), membershipDTO.getDateFrom()))
+                .flatMap(membershipDTO -> membershipService.deleteById(membershipDTO.getId()))
                 .then(ServerResponse.noContent().build());
-    }
 
-    private Map<String, String> getIDs(ServerRequest serverRequest) {
-
-        Map<String, String> pathVariables = new HashMap<>(serverRequest.pathVariables());
-
-        pathVariables.put("gymId", serverRequest.pathVariable("gymId"));
-        pathVariables.put("memberId", serverRequest.pathVariable("memberId"));
-        pathVariables.put("dateFrom", serverRequest.pathVariable("dateFrom"));
-
-        return pathVariables;
     }
 
     private void validate(MembershipDTO membershipDTO) {

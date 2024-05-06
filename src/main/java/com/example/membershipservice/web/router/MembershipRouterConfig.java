@@ -17,7 +17,7 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 public class MembershipRouterConfig {
 
     public static final String MEMBERSHIP_PATH = "/api/membership";
-    public static final String MEMBERSHIP_PATH_ID = MEMBERSHIP_PATH + "/{gymId}/{memberId}/{dateFrom}";
+    public static final String MEMBERSHIP_PATH_ID = MEMBERSHIP_PATH + "/{membershipId}";
 
     private final MembershipHandler membershipHandler;
 

@@ -4,16 +4,13 @@ import com.example.membershipservice.dto.MembershipDTO;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 /**
  * @author Miroslav Kološnjaji
  */
 public interface MembershipService {
-    Mono<MembershipDTO> addMembership(MembershipDTO membershipDTO);
-    Mono<MembershipDTO> updateMembership(MembershipDTO membershipDTO);
-    Mono<MembershipDTO> getMembership(Long gymId, Long memberId, LocalDate dateFrom);
+    Mono<MembershipDTO> save(MembershipDTO membershipDTO);
+    Mono<MembershipDTO> update(MembershipDTO membershipDTO);
+    Mono<MembershipDTO> getById(Long id);
     Flux<MembershipDTO> getAllMemberships();
-    Mono<Void> deleteMembership(Long gymId, Long memberId, LocalDate dateFrom);
+    Mono<Void> deleteById(Long id);
 }
