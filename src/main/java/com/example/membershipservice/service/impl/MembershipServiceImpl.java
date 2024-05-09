@@ -2,7 +2,9 @@ package com.example.membershipservice.service.impl;
 
 import com.example.membershipservice.dto.MembershipDTO;
 import com.example.membershipservice.exception.MembershipNotFoundException;
+import com.example.membershipservice.exception.MissingMembershipDataException;
 import com.example.membershipservice.mapper.MembershipMapper;
+import com.example.membershipservice.model.Membership;
 import com.example.membershipservice.model.MembershipType;
 import com.example.membershipservice.repository.MembershipRepository;
 import com.example.membershipservice.service.MembershipService;
@@ -30,8 +32,13 @@ public class MembershipServiceImpl implements MembershipService {
     @Override
     public Mono<MembershipDTO> save(MembershipDTO membershipDTO) {
 
+        if (membershipDTO.getDateFrom() == null || membershipDTO.getMembershipType() == null) {
+            return Mono.error(new MissingMembershipDataException("Start date and membership type are required."));
+        }
+
         membershipDTO.setDateTo(getDateTo(membershipDTO.getDateFrom(), membershipDTO.getMembershipType()));
         membershipDTO.setPrice(membershipDTO.getMembershipType().getPrice());
+
 
         return membershipRepository.save(membershipMapper.membershipDTOToMembership(membershipDTO))
                 .map(membershipMapper::membershipToMembershipDTO);
