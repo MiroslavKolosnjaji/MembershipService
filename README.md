@@ -18,6 +18,6 @@ to handle concurrent requests efficiently.
 - __JSON:__ Data interchange format for communication between the client and the server.
 
 ### Conclusion
-This MemberService microservice epitomizes contemporary Java development methodologies by leveraging reactive programming, clean architecture,
-and robust testing methodologies, including Behavior-Driven Development (BDD), to deliver efficient and scalable membership menagement functionality.
+The MembershipService microservice embodies modern Java development methodologies, integrating robust testing practices, clean architecture,
+and reactive programming techniques. These elements collectively ensure the delivery of resilient and scalable membership management functionality.
 
